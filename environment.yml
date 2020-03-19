@@ -11,4 +11,5 @@ dependencies:
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
   - sra-tools=2.10.3
+  - pigz=2.4
 
