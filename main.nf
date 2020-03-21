@@ -154,10 +154,10 @@ Channel.from(summary.collect{ [it.key, it.value] })
 
 
 /*
- * STEP 1 - download_and_unpack
+ * STEP 1 - prefetch
  */
-process download_and_unpack {
-    publishDir "${params.outdir}/prefetch", mode: 'copy'
+process prefetch {
+    //publishDir "${params.outdir}/prefetch", mode: 'copy'
 
     maxForks 3
     errorStrategy 'retry'
@@ -167,17 +167,47 @@ process download_and_unpack {
     val run_acc from Channel.fromPath(params.run_acc_list).splitText()
 
     output:
-    //file "[S,E,D]RR*[0-9]" into sra_files
-    tuple "*.fastq.gz" into fastq_files
+    file "[S,E,D]RR*[0-9]" into sra_files
 
     script:
     output_file = run_acc.trim()
     """
     prefetch -o $output_file  --max_size 100000000 $run_acc
-    fasterq-dump --split-3 $run_acc
-    pigz *.fastq
     """
 }
+
+/*
+ * STEP 2 - fasterqdump
+ */
+process fasterqdump {
+    publishDir "${params.outdir}/fasterq_dump", mode: 'copy'
+
+    maxForks 3
+    errorStrategy 'retry'
+    maxRetries 5
+
+    input:
+    val sra_file from sra_files
+
+    output:
+    file "*.fastq.gz" into fastq_files
+
+    script:
+    run_acc = sra_file.toString().split("/")[-1]
+    """
+    if (( $task.attempt == 1 )); then
+      fasterq-dump --split-3 $sra_file
+      pigz *.fastq
+    elif (( $task.attempt >= 1 )); then
+      fasterq-dump --split-3 $run_acc
+      pigz *.fastq
+    fi
+    """
+}
+
+
+
+
 
 ///*
 // * STEP 2 - sort
@@ -366,4 +396,4 @@ def checkHostname() {
     }
 }
 
-//result.view { it.trim() }
+// result.view { it.trim() }
