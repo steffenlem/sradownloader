@@ -172,7 +172,7 @@ process prefetch {
     script:
     output_file = run_acc.trim()
     """
-    prefetch -o $output_file  --max_size 100000000 $run_acc
+    prefetch -o $output_file  --max-size 100000000 $run_acc
     """
 }
 
@@ -184,7 +184,7 @@ process fasterqdump {
 
     maxForks 3
     errorStrategy 'retry'
-    maxRetries 5
+    maxRetries 3
 
     input:
     val sra_file from sra_files
@@ -193,15 +193,9 @@ process fasterqdump {
     file "*.fastq.gz" into fastq_files
 
     script:
-    run_acc = sra_file.toString().split("/")[-1]
     """
-    if (( $task.attempt == 1 )); then
-      fasterq-dump --split-3 $sra_file
-      pigz *.fastq
-    elif (( $task.attempt >= 1 )); then
-      fasterq-dump --split-3 $run_acc
-      pigz *.fastq
-    fi
+    fasterq-dump --split-3 $sra_file
+    pigz *.fastq
     """
 }
 
@@ -210,7 +204,7 @@ process fasterqdump {
 
 
 ///*
-// * STEP 2 - sort
+// * STEP 3 - sort
 // */
 //process sort {
 //    publishDir "${params.outdir}/sorted"
