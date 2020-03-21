@@ -10,7 +10,7 @@ dependencies:
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
-  - sra-tools=2.10.3
+  - sra-tools=2.10.1
   - pigz=2.4
   - click=7.0
 
