@@ -51,6 +51,15 @@ if (params.help) {
  * SET UP CONFIGURATION VARIABLES
  */
 
+params.ngc = 'NO_FILE'
+
+//Channel.fromPath("${params.ngc}")
+//        .into { ngc_channel_1; ngc_channel_2}
+
+ngc_file_1 = file(params.ngc)
+ngc_file_2 = file(params.ngc)
+
+
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
 custom_runName = params.name
@@ -82,9 +91,8 @@ def summary = [:]
 if (workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
-summary['Reads']            = params.reads
-summary['Fasta Ref']        = params.fasta
-summary['Data Type']        = params.single_end ? 'Single-End' : 'Paired-End'
+summary['run_acc_list']     = params.run_acc_list
+summary['ngc']              = params.ngc
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if (workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
@@ -127,52 +135,54 @@ Channel.from(summary.collect{ [it.key, it.value] })
     """.stripIndent() }
     .set { ch_workflow_summary }
 
-///*
-// * Parse software version numbers
-// */
-//process get_software_versions {
-//    publishDir "${params.outdir}/pipeline_info", mode: 'copy',
-//        saveAs: { filename ->
-//            if (filename.indexOf(".csv") > 0) filename
-//            else null
-//        }
-//
-//    output:
-//    file 'software_versions_mqc.yaml' into software_versions_yaml
-//    file "software_versions.csv"
-//
-//    script:
-//    // TODO nf-core: Get all tools to print their version number here
-//    """
-//    echo $workflow.manifest.version > v_pipeline.txt
-//    echo $workflow.nextflow.version > v_nextflow.txt
-//    fastqc --version > v_fastqc.txt
-//    multiqc --version > v_multiqc.txt
-//    scrape_software_versions.py &> software_versions_mqc.yaml
-//    """
-//}
+/*
+ * Parse software version numbers
+ */
+process get_software_versions {
+    publishDir "${params.outdir}/pipeline_info", mode: 'copy',
+        saveAs: { filename ->
+            if (filename.indexOf(".csv") > 0) filename
+            else null
+        }
+
+    output:
+    file 'software_versions_mqc.yaml' into software_versions_yaml
+    file "software_versions.csv"
+
+    script:
+    """
+    echo $workflow.manifest.version > v_pipeline.txt
+    echo $workflow.nextflow.version > v_nextflow.txt
+    prefetch --version > v_prefetch.txt
+    pigz --version > v_pigz.txt
+    fasterq-dump --version > v_fasterq-dump.txt
+    scrape_software_versions.py &> software_versions_mqc.yaml
+    """
+}
 
 
 /*
  * STEP 1 - prefetch
  */
 process prefetch {
-    //publishDir "${params.outdir}/prefetch", mode: 'copy'
-
     maxForks 3
     errorStrategy 'retry'
-    maxRetries 5
+    maxRetries 3
+
 
     input:
     val run_acc from Channel.fromPath(params.run_acc_list).splitText()
+    file ngc_file from ngc_file_1
+
 
     output:
     file "[S,E,D]RR*[0-9]" into sra_files
 
     script:
     output_file = run_acc.trim()
+    def ngc_parameter = ngc_file.name != 'NO_FILE' ? "--ngc $ngc_file" : ''
     """
-    prefetch -o $output_file  --max-size 100000000 $run_acc
+    prefetch -o $output_file $ngc_parameter --max_size 500000000 $run_acc
     """
 }
 
@@ -180,21 +190,20 @@ process prefetch {
  * STEP 2 - fasterqdump
  */
 process fasterqdump {
-    publishDir "${params.outdir}/fasterq_dump", mode: 'copy'
-
+    publishDir "${params.outdir}/fasterq_dump", mode: 'move'
     maxForks 3
-    errorStrategy 'retry'
-    maxRetries 3
 
     input:
     val sra_file from sra_files
+    file ngc_file from ngc_file_1
 
     output:
     file "*.fastq.gz" into fastq_files
 
     script:
+    def ngc_parameter = ngc_file.name != 'NO_FILE' ? "--ngc $ngc_file" : ''
     """
-    fasterq-dump --split-3 $sra_file
+    fasterq-dump $ngc_parameter --split-3 $sra_file
     pigz *.fastq
     """
 }
@@ -240,7 +249,7 @@ process fasterqdump {
 //
 //    script:
 //    """
-//    markdown_to_html.r $output_docs results_description.html
+//    markdown_to_html.py $output_docs -o results_description.html
 //    """
 //}
 
@@ -390,4 +399,4 @@ def checkHostname() {
     }
 }
 
-// result.view { it.trim() }
+ //result.view { it.trim() }
