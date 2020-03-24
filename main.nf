@@ -53,11 +53,8 @@ if (params.help) {
 
 params.ngc = 'NO_FILE'
 
-//Channel.fromPath("${params.ngc}")
-//        .into { ngc_channel_1; ngc_channel_2}
+ngc_file = file(params.ngc)
 
-ngc_file_1 = file(params.ngc)
-ngc_file_2 = file(params.ngc)
 
 
 // Has the run name been specified by the user?
@@ -154,8 +151,9 @@ process get_software_versions {
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     prefetch --version > v_prefetch.txt
-    pigz --version > v_pigz.txt
+    pigz --version 2> v_pigz.txt
     fasterq-dump --version > v_fasterq-dump.txt
+    echo \$(pip freeze | grep Click 2>&1) > v_click.txt
     scrape_software_versions.py &> software_versions_mqc.yaml
     """
 }
@@ -172,7 +170,7 @@ process prefetch {
 
     input:
     val run_acc from Channel.fromPath(params.run_acc_list).splitText()
-    file ngc_file from ngc_file_1
+    file ngc from ngc_file
 
 
     output:
@@ -180,28 +178,28 @@ process prefetch {
 
     script:
     output_file = run_acc.trim()
-    def ngc_parameter = ngc_file.name != 'NO_FILE' ? "--ngc $ngc_file" : ''
+    def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
     prefetch -o $output_file $ngc_parameter --max_size 500000000 $run_acc
     """
 }
 
+
 /*
  * STEP 2 - fasterqdump
  */
 process fasterqdump {
-    publishDir "${params.outdir}/fasterq_dump", mode: 'move'
     maxForks 3
 
     input:
     val sra_file from sra_files
-    file ngc_file from ngc_file_1
+    file ngc from ngc_file
 
     output:
-    file "*.fastq.gz" into fastq_files
+    tuple "*.fastq.gz" into fastq_files
 
     script:
-    def ngc_parameter = ngc_file.name != 'NO_FILE' ? "--ngc $ngc_file" : ''
+    def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
     fasterq-dump $ngc_parameter --split-3 $sra_file
     pigz *.fastq
@@ -209,49 +207,44 @@ process fasterqdump {
 }
 
 
+/*
+ * STEP 3 - sort_fastq_files
+ */
+process sort_fastq_files {
+    publishDir "${params.outdir}/sorted_output_files", mode: 'copy'
+
+    maxForks 3
+
+    input:
+    val fastq_files from fastq_files
+
+    output:
+    file "**.fastq.gz" into outfiles
+
+    script:
+    """
+    sort_reads.py -i "$fastq_files"
+    """
+}
 
 
+/*
+ * STEP 4 - Output Description HTML
+ */
+process output_documentation {
+    publishDir "${params.outdir}/pipeline_info", mode: 'copy'
 
-///*
-// * STEP 3 - sort
-// */
-//process sort {
-//    publishDir "${params.outdir}/sorted"
-//
-//    maxForks 2
-//
-//    input:
-//    val fastq_files from fastq_files
-//
-//    output:
-//    file "*" into outfiles
-//    stdout result
-//
-//    script:
-//    """
-//    sort_reads.py -i "$fastq_files"
-//    """
-//}
+    input:
+    file output_docs from ch_output_docs
 
+    output:
+    file "results_description.html"
 
-
-///*
-// * STEP 3 - Output Description HTML
-// */
-//process output_documentation {
-//    publishDir "${params.outdir}/pipeline_info", mode: 'copy'
-//
-//    input:
-//    file output_docs from ch_output_docs
-//
-//    output:
-//    file "results_description.html"
-//
-//    script:
-//    """
-//    markdown_to_html.py $output_docs -o results_description.html
-//    """
-//}
+    script:
+    """
+    markdown_to_html.py $output_docs -o results_description.html
+    """
+}
 
 /*
  * Completion e-mail notification
@@ -399,4 +392,4 @@ def checkHostname() {
     }
 }
 
- //result.view { it.trim() }
+//result.view { it.trim() }

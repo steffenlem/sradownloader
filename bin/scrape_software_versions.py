@@ -8,9 +8,9 @@ regexes = {
     'steffenlem/sradownloader': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'prefetch': ['v_prefetch.txt', r"(\d{1,2}\.\d{1,2}\.\d{1,2})"],
-    'pigz': ['v_pigz.txt', r"(\d{1,2}\.\d{1,2}\.\d{1,2})"],
-    'fasterq-dump': ['v_fasterq-dump.txt', r"(\d{1,2}\.\d{1,2}\.\d{1,2})"]
-
+    'pigz': ['v_pigz.txt', r"(\d{1,2}\.\d{1,2})"],
+    'fasterq-dump': ['v_fasterq-dump.txt', r"(\d{1,2}\.\d{1,2}\.\d{1,2})"],
+    'Click': ['v_click.txt', r"(\d{1,2}\.\d{1,2})"]
 }
 results = OrderedDict()
 results['steffenlem/sradownloader'] = '<span style="color:#999999;\">N/A</span>'
