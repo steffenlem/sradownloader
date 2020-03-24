@@ -13,4 +13,5 @@ dependencies:
   - sra-tools=2.10.3
   - pigz=2.4
   - click=7.0
+  - markdown=3.1.1
 
