@@ -13,5 +13,5 @@ dependencies:
   - bioconda::sra-tools=2.10.3
   - conda-forge::pigz=2.3.4
   - conda-forge::click=7.1.1
-  - conda-forge::markdown=3.2.1
+  - conda-forge::markdown=3.1.1
 
