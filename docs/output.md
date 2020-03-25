@@ -24,7 +24,7 @@ For further reading and documentation see the [SRA-Tools documentation](https://
 
 ## Fasterq-dump
 
-[sort_fastq_files](https://github.com/ncbi/sra-tools) is another tools of the SRA-tools package. It converts .sra files to FastQ files in a multithreaded manner. The files are automatically split during the conversion process into forward and reverse reads according to the sequencing strategy.The FastQ files are compressed to .fastq.gz files by pigz, to reduce the file size of the output.
+[sort_fastq_files](https://github.com/ncbi/sra-tools) is another tool of the SRA-tools package. It converts .sra files to FastQ files in a multithreaded manner. The files are automatically split during the conversion process into forward and reverse reads according to the sequencing strategy. The FastQ files are compressed to .fastq.gz files by pigz, to reduce the file size of the output.
 
 For further reading and documentation see the [SRA-Tools documentation](https://ncbi.github.io/sra-tools/).
 

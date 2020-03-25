@@ -26,7 +26,7 @@ def helpMessage() {
                                     Available: conda, docker, singularity, awsbatch, test and more.
 
     Optional arguments:
-      --ngc                         dbGAP repository key for files that are 
+      --ngc                         dbGAP repository key for files with controlled-access
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -50,12 +50,6 @@ if (params.help) {
 /*
  * SET UP CONFIGURATION VARIABLES
  */
-
-params.ngc = 'NO_FILE'
-
-ngc_file = file(params.ngc)
-
-
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
@@ -81,6 +75,12 @@ ch_output_docs = file("$baseDir/docs/output.md", checkIfExists: true)
  * Create a channel for input read files
  */
 
+params.ngc = 'NO_FILE'
+ngc_file = file(params.ngc)
+
+if (!params.run_acc_list|| params.run_acc_list == true){
+    exit 1, "Please provide a newline-separated list of SRA run accessions"
+}
 
 // Header log info
 log.info nfcoreHeader()
@@ -158,7 +158,6 @@ process get_software_versions {
     """
 }
 
-
 /*
  * STEP 1 - prefetch
  */
@@ -167,11 +166,9 @@ process prefetch {
     errorStrategy 'retry'
     maxRetries 3
 
-
     input:
     val run_acc from Channel.fromPath(params.run_acc_list).splitText()
     file ngc from ngc_file
-
 
     output:
     file "[S,E,D]RR*[0-9]" into sra_files
@@ -183,7 +180,6 @@ process prefetch {
     prefetch -o $output_file $ngc_parameter --max_size 500000000 $run_acc
     """
 }
-
 
 /*
  * STEP 2 - fasterqdump
@@ -206,7 +202,6 @@ process fasterqdump {
     """
 }
 
-
 /*
  * STEP 3 - sort_fastq_files
  */
@@ -226,7 +221,6 @@ process sort_fastq_files {
     sort_reads.py -i "$fastq_files"
     """
 }
-
 
 /*
  * STEP 4 - Output Description HTML
