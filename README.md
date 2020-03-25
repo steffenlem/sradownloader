@@ -7,7 +7,7 @@
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
-[![Docker](https://img.shields.io/docker/automated/nfcore/sradownloader.svg)](https://hub.docker.com/r/nfcore/sradownloader)
+[![Docker](https://img.shields.io/docker/automated/steffenlem/sradownloader.svg)](https://hub.docker.com/r/steffenlem/sradownloader)
 
 ## Introduction
 
@@ -32,7 +32,7 @@ iv. Start running your own analysis!
 <!-- TODO nf-core: Update the default command above used to run the pipeline -->
 
 ```bash
-nextflow run steffenlem/sradownloader -profile <docker/singularity/conda/institute> --reads '*_R{1,2}.fastq.gz' --genome GRCh37
+nextflow run steffenlem/sradownloader --run_acc_list '<path_to_acc_list.txt>' --ngc '<path_to_key.ngc>' -profile docker
 ```
 
 See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
