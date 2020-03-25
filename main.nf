@@ -18,7 +18,7 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run steffenlem/sradownloader --reads '*_R{1,2}.fastq.gz' -profile docker
+    nextflow run steffenlem/sradownloader --run_acc_list '<path_to_acc_list.txt>' --ngc '<path_to_key.ngc>' -profile docker
 
     Mandatory arguments:
       --run_acc_list                List of SRA run accessions (newline separated)
