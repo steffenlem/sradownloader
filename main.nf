@@ -12,7 +12,7 @@
 def helpMessage() {
     // TODO nf-core: Add to this help message with new command line parameters
     log.info nfcoreHeader()
-    log.info"""
+    log.info """
 
     Usage:
 
@@ -78,7 +78,7 @@ ch_output_docs = file("$baseDir/docs/output.md", checkIfExists: true)
 params.ngc = 'NO_FILE'
 ngc_file = file(params.ngc)
 
-if (!params.run_acc_list|| params.run_acc_list == true){
+if (!params.run_acc_list || params.run_acc_list == true) {
     exit 1, "Please provide a newline-separated list of SRA run accessions"
 }
 
@@ -86,40 +86,41 @@ if (!params.run_acc_list|| params.run_acc_list == true){
 log.info nfcoreHeader()
 def summary = [:]
 if (workflow.revision) summary['Pipeline Release'] = workflow.revision
-summary['Run Name']         = custom_runName ?: workflow.runName
+summary['Run Name'] = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
-summary['run_acc_list']     = params.run_acc_list
-summary['ngc']              = params.ngc
-summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+summary['run_acc_list'] = params.run_acc_list
+summary['ngc'] = params.ngc
+summary['Max Resources'] = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if (workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
-summary['Output dir']       = params.outdir
-summary['Launch dir']       = workflow.launchDir
-summary['Working dir']      = workflow.workDir
-summary['Script dir']       = workflow.projectDir
-summary['User']             = workflow.userName
+summary['Output dir'] = params.outdir
+summary['Launch dir'] = workflow.launchDir
+summary['Working dir'] = workflow.workDir
+summary['Script dir'] = workflow.projectDir
+summary['User'] = workflow.userName
 if (workflow.profile.contains('awsbatch')) {
-    summary['AWS Region']   = params.awsregion
-    summary['AWS Queue']    = params.awsqueue
-    summary['AWS CLI']      = params.awscli
+    summary['AWS Region'] = params.awsregion
+    summary['AWS Queue'] = params.awsqueue
+    summary['AWS CLI'] = params.awscli
 }
 summary['Config Profile'] = workflow.profile
 if (params.config_profile_description) summary['Config Description'] = params.config_profile_description
-if (params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
-if (params.config_profile_url)         summary['Config URL']         = params.config_profile_url
+if (params.config_profile_contact) summary['Config Contact'] = params.config_profile_contact
+if (params.config_profile_url) summary['Config URL'] = params.config_profile_url
 if (params.email || params.email_on_fail) {
-    summary['E-mail Address']    = params.email
+    summary['E-mail Address'] = params.email
     summary['E-mail on failure'] = params.email_on_fail
 }
-log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
+log.info summary.collect { k, v -> "${k.padRight(18)}: $v" }.join("\n")
 log.info "-\033[2m--------------------------------------------------\033[0m-"
 
 // Check the hostnames against configured profiles
 checkHostname()
 
-Channel.from(summary.collect{ [it.key, it.value] })
-    .map { k,v -> "<dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }
-    .reduce { a, b -> return [a, b].join("\n            ") }
-    .map { x -> """
+Channel.from(summary.collect { [it.key, it.value] })
+        .map { k, v -> "<dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }
+        .reduce { a, b -> return [a, b].join("\n            ") }
+        .map { x ->
+            """
     id: 'nf-core-sradownloader-summary'
     description: " - this information is collected when the pipeline is started."
     section_name: 'steffenlem/sradownloader Workflow Summary'
@@ -129,18 +130,19 @@ Channel.from(summary.collect{ [it.key, it.value] })
         <dl class=\"dl-horizontal\">
             $x
         </dl>
-    """.stripIndent() }
-    .set { ch_workflow_summary }
+    """.stripIndent()
+        }
+        .set { ch_workflow_summary }
 
 /*
  * Parse software version numbers
  */
 process get_software_versions {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
-        saveAs: { filename ->
-            if (filename.indexOf(".csv") > 0) filename
-            else null
-        }
+            saveAs: { filename ->
+                if (filename.indexOf(".csv") > 0) filename
+                else null
+            }
 
     output:
     file 'software_versions_mqc.yaml' into software_versions_yaml
@@ -292,7 +294,7 @@ workflow.onComplete {
     def email_html = html_template.toString()
 
     // Render the sendmail template
-    def smail_fields = [ email: email_address, subject: subject, email_txt: email_txt, email_html: email_html, baseDir: "$baseDir" ]
+    def smail_fields = [email: email_address, subject: subject, email_txt: email_txt, email_html: email_html, baseDir: "$baseDir"]
     def sf = new File("$baseDir/assets/sendmail_template.txt")
     def sendmail_template = engine.createTemplate(sf).make(smail_fields)
     def sendmail_html = sendmail_template.toString()
@@ -300,13 +302,15 @@ workflow.onComplete {
     // Send the HTML e-mail
     if (email_address) {
         try {
-            if (params.plaintext_email) { throw GroovyException('Send plaintext e-mail, not HTML') }
+            if (params.plaintext_email) {
+                throw GroovyException('Send plaintext e-mail, not HTML')
+            }
             // Try to send HTML e-mail using sendmail
-            [ 'sendmail', '-t' ].execute() << sendmail_html
+            ['sendmail', '-t'].execute() << sendmail_html
             log.info "[steffenlem/sradownloader] Sent summary e-mail to $email_address (sendmail)"
         } catch (all) {
             // Catch failures and try with plaintext
-            [ 'mail', '-s', subject, email_address ].execute() << email_txt
+            ['mail', '-s', subject, email_address].execute() << email_txt
             log.info "[steffenlem/sradownloader] Sent summary e-mail to $email_address (mail)"
         }
     }
