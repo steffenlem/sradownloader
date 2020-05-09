@@ -1,6 +1,6 @@
-# nf-core/sradownloader: Documentation
+# steffenlem/sradownloader: Documentation
 
-The nf-core/sradownloader documentation is split into the following files:
+The steffenlem/sradownloader documentation is split into the following files:
 
 1. [Installation](https://nf-co.re/usage/installation)
 2. Pipeline configuration

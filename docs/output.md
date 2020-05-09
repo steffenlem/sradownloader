@@ -1,4 +1,4 @@
-# nf-core/sradownloader: Output
+# steffenlem/sradownloader: Output
 
 This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
@@ -9,35 +9,30 @@ This document describes the output produced by the pipeline. Most of the plots a
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
-* [FastQC](#fastqc) - read quality control
-* [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
+* [Prefetch](#prefetch) - download of SRA data
+* [Fasterq-dump](#fasterq-dump) - converts SRA files to FastQ files
+* [sort_fastq_files](#sort_fastq_files) - sorts fastq files into single-end and paired-end
 
-## FastQC
+## Prefetch
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your reads. It provides information about the quality score distribution across your reads, the per base sequence content (%T/A/G/C). You get information about adapter contamination and other overrepresented sequences.
+[Prefetch](https://github.com/ncbi/sra-tools) is a tool of the SRA-tools package. It downloads and saves a .sra file for each SRA run accession. 
 
-For further reading and documentation see the [FastQC help](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+For further reading and documentation see the [SRA-Tools documentation](https://ncbi.github.io/sra-tools/).
 
-> **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality. To see how your reads look after trimming, look at the FastQC reports in the `trim_galore` directory.
+<!-- > **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality. To see how your reads look after trimming, look at the FastQC reports in the `trim_galore` directory. -->
 
-**Output directory: `results/fastqc`**
 
-* `sample_fastqc.html`
-  * FastQC report, containing quality metrics for your untrimmed raw fastq files
-* `zips/sample_fastqc.zip`
-  * zip file containing the FastQC report, tab-delimited data file and plot images
+## Fasterq-dump
 
-## MultiQC
+[sort_fastq_files](https://github.com/ncbi/sra-tools) is another tool of the SRA-tools package. It converts .sra files to FastQ files in a multithreaded manner. The files are automatically split during the conversion process into forward and reverse reads according to the sequencing strategy. The FastQ files are compressed to .fastq.gz files by pigz, to reduce the file size of the output.
 
-[MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.
+For further reading and documentation see the [SRA-Tools documentation](https://ncbi.github.io/sra-tools/).
 
-The pipeline has special steps which allow the software versions used to be reported in the MultiQC output for future traceability.
 
-**Output directory: `results/multiqc`**
 
-* `Project_multiqc_report.html`
-  * MultiQC report - a standalone HTML file that can be viewed in your web browser
-* `Project_multiqc_data/`
-  * Directory containing parsed statistics from the different tools used in the pipeline
+## sort_fastq_files
 
-For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)
+[sort_fastq_files~~~~](https://github.com/ncbi/sra-tools) sorts the reads according to their orientation, which is either singleEnd or pairedEnd. During the conversion step to FastQ files in paired-end experiments, in some cases, unmatched reads are produced, which are sorted into a separate output directory called 'unmatched_reads'.
+
+**Output directory: `results/sorted_output_files`**
+

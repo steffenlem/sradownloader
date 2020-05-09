@@ -1,4 +1,4 @@
-# nf-core/sradownloader feature request
+# steffenlem/sradownloader feature request
 
 Hi there!
 

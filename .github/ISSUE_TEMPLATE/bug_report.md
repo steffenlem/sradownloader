@@ -1,4 +1,4 @@
-# nf-core/sradownloader bug report
+# steffenlem/sradownloader bug report
 
 Hi there!
 

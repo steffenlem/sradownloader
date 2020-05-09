@@ -1,6 +1,6 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nf-core-sradownloader-1.0dev
+name: nf-core-sradownloader-1.0.0
 channels:
   - conda-forge
   - bioconda
@@ -10,6 +10,8 @@ dependencies:
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
   - conda-forge::pygments=2.5.2
-  # TODO nf-core: Add required software dependencies here
-  - bioconda::fastqc=0.11.8
-  - bioconda::multiqc=1.7
+  - bioconda::sra-tools=2.10.3
+  - conda-forge::pigz=2.3.4
+  - conda-forge::click=7.1.1
+  - conda-forge::markdown=3.1.1
+
