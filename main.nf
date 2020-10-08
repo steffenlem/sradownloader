@@ -179,7 +179,7 @@ process prefetch {
     output_file = run_acc.trim()
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    prefetch -o $output_file $ngc_parameter --max_size 500000000 $run_acc
+    prefetch -o $output_file $ngc_parameter --max-size 500000000 $run_acc
     """
 }
 
@@ -194,7 +194,7 @@ process fasterqdump {
     file ngc from ngc_file
 
     output:
-    tuple "*.fastq.gz" into fastq_files
+    path "*.fastq.gz" into fastq_files
 
     script:
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
@@ -206,7 +206,7 @@ process fasterqdump {
 
 /*
  * STEP 3 - sort_fastq_files
- */
+*/
 process sort_fastq_files {
     publishDir "${params.outdir}/sorted_output_files", mode: 'copy'
 
