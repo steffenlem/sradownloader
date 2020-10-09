@@ -14,4 +14,5 @@ dependencies:
   - conda-forge::pigz=2.3.4
   - conda-forge::click=7.1.1
   - conda-forge::markdown=3.1.1
+  - conda-forge::shortuuid=1.0.1
 

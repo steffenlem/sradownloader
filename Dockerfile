@@ -11,3 +11,5 @@ ENV PATH /opt/conda/envs/nf-core-sradownloader-1.0.0/bin:$PATH
 
 # Dump the details of the installed packages to a file for posterity
 RUN conda env export --name nf-core-sradownloader-1.0.0 > nf-core-sradownloader-1.0.0.yml
+RUN mkdir -p /root/.ncbi
+RUN printf '/LIBS/GUID = "%s"\n' `uuid` > /root/.ncbi/user-settings.mkfg
