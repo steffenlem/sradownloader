@@ -173,7 +173,8 @@ process prefetch {
     file ngc from ngc_file
 
     output:
-    file "[S,E,D]RR*[0-9]" into sra_files
+    stdout result
+    //file "[S,E,D]RR*[0-9]" into sra_files
 
     script:
     output_file = run_acc.trim()
@@ -186,7 +187,7 @@ process prefetch {
 
 /*
  * STEP 2 - fasterqdump
- */
+
 process fasterqdump {
     maxForks 3
 
@@ -204,10 +205,10 @@ process fasterqdump {
     pigz *.fastq
     """
 }
-
+*/
 /*
  * STEP 3 - sort_fastq_files
-*/
+
 process sort_fastq_files {
     publishDir "${params.outdir}/sorted_output_files", mode: 'copy'
 
@@ -224,7 +225,7 @@ process sort_fastq_files {
     sort_reads.py -i "$fastq_files"
     """
 }
-
+*/
 /*
  * STEP 4 - Output Description HTML
 
@@ -391,4 +392,4 @@ def checkHostname() {
     }
 }
 
-//result.view { it.trim() }
+result.view { it.trim() }
