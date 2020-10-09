@@ -180,6 +180,7 @@ process prefetch {
     output_file = run_acc.trim()
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
+    cat /root/.ncbi/user-settings.mkfg
     vdb-config -f
     which prefetch
     prefetch -o $output_file $ngc_parameter --max-size 500000000 $run_acc
