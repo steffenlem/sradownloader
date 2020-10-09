@@ -226,7 +226,7 @@ process sort_fastq_files {
 
 /*
  * STEP 4 - Output Description HTML
- */
+
 process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
 
@@ -241,7 +241,7 @@ process output_documentation {
     markdown_to_html.py $output_docs -o results_description.html
     """
 }
-
+*/
 /*
  * Completion e-mail notification
  */
