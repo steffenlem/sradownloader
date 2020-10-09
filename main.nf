@@ -136,7 +136,7 @@ Channel.from(summary.collect { [it.key, it.value] })
 
 /*
  * Parse software version numbers
- */
+
 process get_software_versions {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy',
             saveAs: { filename ->
@@ -159,7 +159,7 @@ process get_software_versions {
     scrape_software_versions.py &> software_versions_mqc.yaml
     """
 }
-
+*/
 /*
  * STEP 1 - prefetch
  */
