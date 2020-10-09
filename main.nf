@@ -160,6 +160,17 @@ process get_software_versions {
     """
 }
 */
+
+process certificate {
+    output:
+    file user-settings.mkfg
+
+    script:
+    uuid > user-settings.mkfg
+
+}
+
+
 /*
  * STEP 1 - prefetch
  */
