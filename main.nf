@@ -187,8 +187,6 @@ process prefetch {
  * STEP 2 - fasterqdump
  */
 process fasterqdump {
-    maxForks 3
-
     input:
     val sra_file from sra_files
     file ngc from ngc_file
@@ -199,7 +197,7 @@ process fasterqdump {
     script:
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    fasterq-dump --threads 6 $ngc_parameter --split-3 $sra_file
+    fasterq-dump --threads 8 $ngc_parameter --split-3 $sra_file
     pigz *.fastq
     """
 }
@@ -209,8 +207,6 @@ process fasterqdump {
 */
 process sort_fastq_files {
     publishDir "${params.outdir}/sorted_output_files", mode: 'copy'
-
-    maxForks 3
 
     input:
     val fastq_files from fastq_files
