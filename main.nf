@@ -163,12 +163,21 @@ process get_software_versions {
 
 process certificate {
     output:
-    file user-settings.mkfg
+    //val 'user-settings.mkfg'
+    stdout result
 
     script:
+    """
     uuid > user-settings.mkfg
-
+    vdb-config --cfg-dir \$PWD
+    #vdb-config --all
+    prefetch --help
+    #echo \$PWD
+    """
 }
+
+
+
 
 
 /*
@@ -191,9 +200,11 @@ process prefetch {
     output_file = run_acc.trim()
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    cat /root/.ncbi/user-settings.mkfg
-    vdb-config -f
-    which prefetch
+    echo \$PWD
+    echo ls
+    #cat /root/.ncbi/user-settings.mkfg
+    #vdb-config --all
+    #which prefetch
     prefetch -o $output_file $ngc_parameter --max-size 500000000 $run_acc
     """
 }
