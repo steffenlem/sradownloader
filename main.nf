@@ -199,7 +199,7 @@ process fasterqdump {
     script:
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    fasterq-dump $ngc_parameter --split-3 $sra_file
+    fasterq-dump --threads 6 $ngc_parameter --split-3 $sra_file
     pigz *.fastq
     """
 }
