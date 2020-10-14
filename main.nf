@@ -160,6 +160,18 @@ process get_software_versions {
     """
 }
 
+
+/*
+* STEP 0 - Generate user config
+*/
+process configuration {
+    script:
+    """
+    mkdir -p ~/.ncbi
+    printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
+    """
+}
+
 /*
  * STEP 1 - prefetch
  */

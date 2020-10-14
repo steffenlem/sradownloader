@@ -11,5 +11,3 @@ ENV PATH /opt/conda/envs/steffenlem-sradownloader-1.0.0/bin:$PATH
 
 # Dump the details of the installed packages to a file for posterity
 RUN conda env export --name steffenlem-sradownloader-1.0.0 > steffenlem-sradownloader-1.0.0.yml
-RUN mkdir -p .ncbi
-RUN printf '/LIBS/GUID = "%s"\n' `uuid` > .ncbi/user-settings.mkfg
