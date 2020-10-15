@@ -160,6 +160,18 @@ process get_software_versions {
     """
 }
 
+
+/*
+* STEP 0 - Generate user config
+*/
+process configuration {
+    script:
+    """
+    mkdir -p ~/.ncbi
+    printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
+    """
+}
+
 /*
  * STEP 1 - prefetch
  */
@@ -179,7 +191,7 @@ process prefetch {
     output_file = run_acc.trim()
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    prefetch -o $output_file $ngc_parameter --max_size 500000000 $run_acc
+    prefetch -o $output_file $ngc_parameter --max-size 500000000 $run_acc
     """
 }
 
@@ -187,30 +199,26 @@ process prefetch {
  * STEP 2 - fasterqdump
  */
 process fasterqdump {
-    maxForks 3
-
     input:
     val sra_file from sra_files
     file ngc from ngc_file
 
     output:
-    tuple "*.fastq.gz" into fastq_files
+    path "*.fastq.gz" into fastq_files
 
     script:
     def ngc_parameter = ngc.name != 'NO_FILE' ? "--ngc $ngc" : ''
     """
-    fasterq-dump $ngc_parameter --split-3 $sra_file
+    fasterq-dump --threads 8 $ngc_parameter --split-3 $sra_file
     pigz *.fastq
     """
 }
 
 /*
  * STEP 3 - sort_fastq_files
- */
+*/
 process sort_fastq_files {
     publishDir "${params.outdir}/sorted_output_files", mode: 'copy'
-
-    maxForks 3
 
     input:
     val fastq_files from fastq_files
