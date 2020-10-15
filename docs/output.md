@@ -32,7 +32,7 @@ For further reading and documentation see the [SRA-Tools documentation](https://
 
 ## sort_fastq_files
 
-[sort_fastq_files~~~~](https://github.com/ncbi/sra-tools) sorts the reads according to their orientation, which is either singleEnd or pairedEnd. During the conversion step to FastQ files in paired-end experiments, in some cases, unmatched reads are produced, which are sorted into a separate output directory called 'unmatched_reads'.
+[sort_fastq_files~~~~](https://github.com/ncbi/sra-tools) sorts the reads according to their orientation, which is either singleEnd or pairedEnd. During the conversion step to FastQ files in paired-end experiments, in some cases, unmatched reads are produced, which are sorted into a separate directory called 'pairedEnd/unmatched_reads'.
 
 **Output directory: `results/sorted_output_files`**
 
