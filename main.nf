@@ -135,6 +135,17 @@ Channel.from(summary.collect { [it.key, it.value] })
         .set { ch_workflow_summary }
 
 /*
+* Generate user config
+*/
+process configuration {
+script:
+"""
+mkdir -p ~/.ncbi
+printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
+"""
+}
+
+/*
  * Parse software version numbers
  */
 process get_software_versions {
@@ -157,18 +168,6 @@ process get_software_versions {
     fasterq-dump --version > v_fasterq-dump.txt
     echo \$(pip freeze | grep Click 2>&1) > v_click.txt
     scrape_software_versions.py &> software_versions_mqc.yaml
-    """
-}
-
-
-/*
-* STEP 0 - Generate user config
-*/
-process configuration {
-    script:
-    """
-    mkdir -p ~/.ncbi
-    printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
     """
 }
 
