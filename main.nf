@@ -138,7 +138,7 @@ Channel.from(summary.collect { [it.key, it.value] })
 * Generate user config
 */
 process configuration {
-    out:
+    output:
     val "finshed" into config_status
 
     script:
