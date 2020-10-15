@@ -138,10 +138,13 @@ Channel.from(summary.collect { [it.key, it.value] })
 * Generate user config
 */
 process configuration {
-script:
-"""
-mkdir -p ~/.ncbi
-printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
+    out:
+    val "finshed" into config_status
+
+    script:
+    """
+    mkdir -p ~/.ncbi
+    printf '/LIBS/GUID = "%s"\n' `uuid` > ~/.ncbi/user-settings.mkfg
 """
 }
 
@@ -154,6 +157,9 @@ process get_software_versions {
                 if (filename.indexOf(".csv") > 0) filename
                 else null
             }
+
+    input:
+    val status from config_status
 
     output:
     file 'software_versions_mqc.yaml' into software_versions_yaml
@@ -180,6 +186,7 @@ process prefetch {
     maxRetries 3
 
     input:
+    val status from config_status
     val run_acc from Channel.fromPath(params.run_acc_list).splitText()
     file ngc from ngc_file
 
