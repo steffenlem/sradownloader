@@ -17,8 +17,8 @@ def main(inputpaths):
         os.makedirs('singleEnd')
     if not os.path.exists('pairedEnd'):
         os.makedirs('pairedEnd')
-    if not os.path.exists('unmatched_reads'):
-        os.makedirs('unmatched_reads')
+    if not os.path.exists('pairedEnd/unmatched_reads'):
+        os.makedirs('pairedEnd/unmatched_reads')
 
     # get all unpaired files / only one biological replicate
     work_dir = os.getcwd()
@@ -36,7 +36,7 @@ def main(inputpaths):
             if "_1.fastq.gz" in single_fastq or "_2.fastq.gz" in single_fastq:
                 os.symlink(single_fastq, "pairedEnd/" + file_name)
             else:
-                os.symlink(single_fastq, "unmatched_reads/" + file_name)
+                os.symlink(single_fastq, "pairedEnd/unmatched_reads/" + file_name)
 
 
 def get_file_paths(inputpaths):
