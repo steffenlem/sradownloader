@@ -205,6 +205,9 @@ process prefetch {
  * STEP 2 - fasterqdump
  */
 process fasterqdump {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val sra_file from sra_files
     file ngc from ngc_file
